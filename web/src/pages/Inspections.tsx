@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { Badge } from '../components/ui/Badge';
-import { Plus, FileText, CheckCircle, XCircle, Printer, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, CheckCircle, XCircle, Printer } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
@@ -98,7 +97,6 @@ export default function Inspections() {
     const [vehicles, setVehicles] = useState<any[]>([]);
     const [partners, setPartners] = useState<any[]>([]);
     const [showForm, setShowForm] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -114,7 +112,6 @@ export default function Inspections() {
     const [categories, setCategories] = useState<ChecklistCategory[]>(DEFAULT_CATEGORIES);
 
     async function load() {
-        setLoading(true);
         try {
             const [inspRes, vehRes, partRes] = await Promise.all([
                 api.get('/inspections'),
@@ -127,7 +124,6 @@ export default function Inspections() {
         } catch (error) {
             console.error(error);
         }
-        setLoading(false);
     }
 
     useEffect(() => { load() }, []);

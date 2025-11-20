@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth';
@@ -15,9 +17,18 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 
-// Middleware
+// Security Middleware
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Muitas requisições deste IP, tente novamente mais tarde.'
+});
+app.use(limiter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

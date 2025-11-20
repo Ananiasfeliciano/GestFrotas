@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Car, Settings, LogOut, X, Users, ClipboardCheck, Wrench, Fuel } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';

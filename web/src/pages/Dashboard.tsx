@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { LayoutDashboard, Car, AlertTriangle, CheckCircle, Activity, Users, ClipboardCheck, Plus, ArrowRight } from 'lucide-react';
+import { Car, AlertTriangle, Activity, ClipboardCheck, Plus, ArrowRight } from 'lucide-react';
 import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Link } from 'react-router-dom';

@@ -4,7 +4,6 @@ import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { Badge } from '../components/ui/Badge';
 import { Plus, Edit2, Trash2, Wrench, ShoppingBag, Fuel, Phone, MapPin, Mail } from 'lucide-react';
 
 type Partner = {

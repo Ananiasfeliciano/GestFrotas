@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Badge } from '../components/ui/Badge';
-import { Plus, Wrench, Calendar, DollarSign, Car, AlertCircle } from 'lucide-react';
+import { Plus, Wrench, Calendar, Car } from 'lucide-react';
 import { format } from 'date-fns';
 
 type Maintenance = {
