@@ -4,7 +4,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "dev:local": "prisma generate --schema=./src/prisma/schema.local.prisma && ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:local": "prisma generate --schema=./src/prisma/schema.local.prisma && ts-node-dev --respawn --transpile-only index.ts",
     "build": "npx prisma generate --schema=./src/prisma/schema.prisma && tsc",
     "start": "node dist/server.js",
     "prisma:generate": "prisma generate --schema=./src/prisma/schema.prisma",
