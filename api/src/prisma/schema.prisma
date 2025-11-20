@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String
+  createdAt DateTime @default(now())
+}
+
+model Vehicle {
+  id        String   @id @default(uuid())
+  plate     String   @unique
+  model     String?
+  brand     String?
+  year      Int?
+  km        Float    @default(0)
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  inspections Inspection[]
+  maintenances Maintenance[]
+  refuelings Refueling[]
+}
+
+model Partner {
+  id        String   @id @default(uuid())
+  name      String
+  type      String   // WORKSHOP, SUPPLIER, GAS_STATION
+  email     String?
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  inspections Inspection[]
+  maintenances Maintenance[]
+}
+
+model Inspection {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  partnerId   String?
+  partner     Partner? @relation(fields: [partnerId], references: [id])
+  date        DateTime @default(now())
+  status      String   // PASSED, FAILED, PENDING
+  items       String   // Checklist items results (JSON string)
+  notes       String?
+  cost        Float?
+  odometer    Float?
+  fuelLevel   String?
+  createdAt   DateTime @default(now())
+}
+
+model Maintenance {
+  id          String   @id @default(uuid())
+  vehicleId   String
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  partnerId   String
+  partner     Partner  @relation(fields: [partnerId], references: [id])
+  description String
+  date        DateTime
+  cost        Float
+  odometer    Float
+  status      String   // SCHEDULED, IN_PROGRESS, COMPLETED
+  createdAt   DateTime @default(now())
+}
+
+model Refueling {
+  id            String   @id @default(uuid())
+  vehicleId     String
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id])
+  date          DateTime
+  odometer      Float    // Quilometragem no momento do abastecimento
+  liters        Float    // Quantidade de litros abastecidos
+  costPerLiter  Float    // Preço por litro
+  totalCost     Float    // Custo total
+  fuelType      String   // GASOLINE, DIESEL, ETHANOL, CNG
+  driver        String   // Nome do condutor
+  consumption   Float?   // km/l (calculado automaticamente)
+  notes         String?  // Observações opcionais
+  createdAt     DateTime @default(now())
+}
