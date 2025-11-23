@@ -1,0 +1,29 @@
+services:
+  # API Service
+  - type: web
+    name: gestfrota-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd api && npm install && npx prisma generate --schema=./src/prisma/schema.prisma
+    startCommand: cd api && npx ts-node server.ts
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: DATABASE_URL
+        fromDatabase:
+          name: gestfrota-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+
+# PostgreSQL Database
+databases:
+  - name: gestfrota-db
+    databaseName: gestfrota
+    user: gestfrota
+    plan: free
