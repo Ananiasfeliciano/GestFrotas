@@ -95,16 +95,13 @@ const DEFAULT_CATEGORIES: ChecklistCategory[] = [
 export default function Inspections() {
     const [inspections, setInspections] = useState<Inspection[]>([]);
     const [vehicles, setVehicles] = useState<any[]>([]);
-    const [partners, setPartners] = useState<any[]>([]);
     const [showForm, setShowForm] = useState(false);
 
     // Form state
     const [formData, setFormData] = useState({
         vehicleId: '',
-        partnerId: '',
         date: new Date().toISOString().split('T')[0],
         notes: '',
-        cost: 0,
         odometer: 0,
         fuelLevel: '1/1',
     });
@@ -113,14 +110,12 @@ export default function Inspections() {
 
     async function load() {
         try {
-            const [inspRes, vehRes, partRes] = await Promise.all([
+            const [inspRes, vehRes] = await Promise.all([
                 api.get('/inspections'),
-                api.get('/vehicles'),
-                api.get('/partners')
+                api.get('/vehicles')
             ]);
             setInspections(inspRes.data);
             setVehicles(vehRes.data);
-            setPartners(partRes.data);
         } catch (error) {
             console.error(error);
         }
@@ -137,7 +132,6 @@ export default function Inspections() {
 
             const payload = {
                 ...formData,
-                partnerId: formData.partnerId || undefined, // Send undefined if empty string
                 status,
                 items: JSON.stringify(categories),
             };
@@ -147,10 +141,8 @@ export default function Inspections() {
             // Reset form
             setFormData({
                 vehicleId: '',
-                partnerId: '',
                 date: new Date().toISOString().split('T')[0],
                 notes: '',
-                cost: 0,
                 odometer: 0,
                 fuelLevel: '1/1',
             });
@@ -179,31 +171,28 @@ export default function Inspections() {
         doc.setFontSize(10);
 
         const vehicle = inspection.vehicle ? `${inspection.vehicle.plate} - ${inspection.vehicle.model}` : 'N/A';
-        const partner = inspection.partner ? inspection.partner.name : 'Interna';
         const status = inspection.status === 'PASSED' ? 'APROVADO' : 'REPROVADO';
 
         autoTable(doc, {
             startY: 45,
-            head: [['Veículo', 'Data', 'Status', 'Parceiro']],
+            head: [['Veículo', 'Data', 'Status']],
             body: [[
                 vehicle,
                 format(new Date(inspection.date), 'dd/MM/yyyy'),
-                status,
-                partner
+                status
             ]],
             theme: 'plain',
             styles: { fontSize: 10, cellPadding: 2 },
             headStyles: { fontStyle: 'bold' }
         });
 
-        // Details (KM, Fuel, Cost)
+        // Details (KM, Fuel)
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 5,
-            head: [['Odômetro', 'Combustível', 'Custo']],
+            head: [['Odômetro', 'Combustível']],
             body: [[
                 `${inspection.odometer || 0} KM`,
-                inspection.fuelLevel || '-',
-                `R$ ${inspection.cost || 0}`
+                inspection.fuelLevel || '-'
             ]],
             theme: 'plain',
             styles: { fontSize: 10, cellPadding: 2 },
@@ -310,7 +299,7 @@ export default function Inspections() {
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Basic Info */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Veículo</label>
                                         <select
@@ -325,19 +314,6 @@ export default function Inspections() {
                                             ))}
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Parceiro (Opcional)</label>
-                                        <select
-                                            className="w-full rounded-md border border-gray-300 p-2"
-                                            value={formData.partnerId}
-                                            onChange={e => setFormData({ ...formData, partnerId: e.target.value })}
-                                        >
-                                            <option value="">Selecione...</option>
-                                            {partners.map(p => (
-                                                <option key={p.id} value={p.id}>{p.name} ({p.type})</option>
-                                            ))}
-                                        </select>
-                                    </div>
                                     <Input
                                         label="Data"
                                         type="date"
@@ -347,7 +323,7 @@ export default function Inspections() {
                                 </div>
 
                                 {/* Details */}
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <Input
                                         label="Odômetro (KM)"
                                         type="number"
@@ -368,12 +344,6 @@ export default function Inspections() {
                                             <option value="1/1">Cheio</option>
                                         </select>
                                     </div>
-                                    <Input
-                                        label="Custo (R$)"
-                                        type="number"
-                                        value={formData.cost}
-                                        onChange={e => setFormData({ ...formData, cost: Number(e.target.value) })}
-                                    />
                                 </div>
 
                                 {/* Categorized Checklist */}

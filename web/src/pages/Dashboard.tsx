@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Car, AlertTriangle, Activity, ClipboardCheck, Plus, ArrowRight } from 'lucide-react';
+import { Car, AlertTriangle, Activity, ClipboardCheck, Plus, ArrowRight, Fuel, Wrench } from 'lucide-react';
 import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Link } from 'react-router-dom';
@@ -23,13 +23,19 @@ export default function Dashboard() {
     const [vehicleStatusData, setVehicleStatusData] = useState<any[]>([]);
     const [inspectionHistoryData, setInspectionHistoryData] = useState<any[]>([]);
     const [recentInspections, setRecentInspections] = useState<any[]>([]);
+    const [refuelingStats, setRefuelingStats] = useState({ totalCost: 0, totalLiters: 0 });
+    const [recentRefuelings, setRecentRefuelings] = useState<any[]>([]);
+    const [maintenanceStats, setMaintenanceStats] = useState({ totalCost: 0, totalMaintenances: 0 });
+    const [recentMaintenances, setRecentMaintenances] = useState<any[]>([]);
 
     async function loadStats() {
         try {
-            const [vehRes, partRes, inspRes] = await Promise.all([
+            const [vehRes, partRes, inspRes, refuelRes, maintRes] = await Promise.all([
                 api.get('/vehicles'),
                 api.get('/partners'),
-                api.get('/inspections')
+                api.get('/inspections'),
+                api.get('/refuelings'),
+                api.get('/maintenances')
             ]);
 
             const vehicles = vehRes.data;
@@ -74,6 +80,19 @@ export default function Dashboard() {
 
             // Recent Activity
             setRecentInspections(inspections.slice(0, 5));
+
+            // Refueling Stats
+            const refuelings = refuelRes.data;
+            const totalCost = refuelings.reduce((sum: number, r: any) => sum + (r.totalCost || 0), 0);
+            const totalLiters = refuelings.reduce((sum: number, r: any) => sum + (r.liters || 0), 0);
+            setRefuelingStats({ totalCost, totalLiters });
+            setRecentRefuelings(refuelings.slice(0, 5));
+
+            // Maintenance Stats
+            const maintenances = maintRes.data;
+            const totalMaintenanceCost = maintenances.reduce((sum: number, m: any) => sum + (m.cost || 0), 0);
+            setMaintenanceStats({ totalCost: totalMaintenanceCost, totalMaintenances: maintenances.length });
+            setRecentMaintenances(maintenances.slice(0, 5));
 
         } catch (error) {
             console.error('Erro ao carregar estatísticas', error);
@@ -236,6 +255,124 @@ export default function Dashboard() {
                                                 {insp.status === 'PASSED' ? 'Aprovado' : insp.status === 'FAILED' ? 'Reprovado' : 'Pendente'}
                                             </span>
                                             <Link to="/inspections" className="text-gray-400 hover:text-brand-600">
+                                                <ArrowRight size={20} />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Refueling Stats Card */}
+                <div className="grid gap-6 md:grid-cols-2">
+                    <Card className="border-l-4 border-l-blue-500">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-500">Custo Total Combustível</CardTitle>
+                            <Fuel className="h-4 w-4 text-blue-500" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">R$ {refuelingStats.totalCost.toFixed(2)}</div>
+                            <p className="text-xs text-gray-500">{refuelingStats.totalLiters.toFixed(2)} litros abastecidos</p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Recent Refuelings */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Últimos Abastecimentos</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {recentRefuelings.length === 0 ? (
+                                <p className="text-gray-500 text-center py-4">Nenhum abastecimento registrado.</p>
+                            ) : (
+                                recentRefuelings.map((refuel) => (
+                                    <div key={refuel.id} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 rounded-full bg-blue-100 text-blue-600">
+                                                <Fuel size={20} />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-900">
+                                                    {refuel.vehicle?.plate || 'Veículo não identificado'}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    {format(new Date(refuel.date), 'dd/MM/yyyy')} • {refuel.liters}L
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-sm font-medium text-gray-900">
+                                                R$ {refuel.totalCost?.toFixed(2) || '0.00'}
+                                            </span>
+                                            <Link to="/refuelings" className="text-gray-400 hover:text-brand-600">
+                                                <ArrowRight size={20} />
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Maintenance Stats Card */}
+                <div className="grid gap-6 md:grid-cols-2">
+                    <Card className="border-l-4 border-l-orange-500">
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <CardTitle className="text-sm font-medium text-gray-500">Custo Total Manutenções</CardTitle>
+                            <Wrench className="h-4 w-4 text-orange-500" />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">R$ {maintenanceStats.totalCost.toFixed(2)}</div>
+                            <p className="text-xs text-gray-500">{maintenanceStats.totalMaintenances} manutenções realizadas</p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Recent Maintenances */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Últimas Manutenções</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {recentMaintenances.length === 0 ? (
+                                <p className="text-gray-500 text-center py-4">Nenhuma manutenção registrada.</p>
+                            ) : (
+                                recentMaintenances.map((maint) => (
+                                    <div key={maint.id} className="flex items-center justify-between border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 rounded-full bg-orange-100 text-orange-600">
+                                                <Wrench size={20} />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-900">
+                                                    {maint.vehicle?.plate || 'Veículo não identificado'}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    {format(new Date(maint.date), 'dd/MM/yyyy')} • {maint.partner?.name || 'Oficina'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-right">
+                                                <span className="text-sm font-medium text-gray-900 block">
+                                                    R$ {maint.cost?.toFixed(2) || '0.00'}
+                                                </span>
+                                                <span className={`text-xs ${maint.status === 'COMPLETED' ? 'text-green-600' :
+                                                        maint.status === 'IN_PROGRESS' ? 'text-yellow-600' :
+                                                            'text-blue-600'
+                                                    }`}>
+                                                    {maint.status === 'COMPLETED' ? 'Concluído' :
+                                                        maint.status === 'IN_PROGRESS' ? 'Em Andamento' :
+                                                            'Agendado'}
+                                                </span>
+                                            </div>
+                                            <Link to="/maintenances" className="text-gray-400 hover:text-brand-600">
                                                 <ArrowRight size={20} />
                                             </Link>
                                         </div>
