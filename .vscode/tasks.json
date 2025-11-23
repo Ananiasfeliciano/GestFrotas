@@ -1,0 +1,59 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "API: Start (job)",
+      "type": "shell",
+      "command": "Start-Job -Name FleetApi -ScriptBlock { Push-Location \"c:\\Users\\bckmi\\OneDrive\\Desktop\\FLEET GESTAO DE FROTAS\\fleet-saas-latest\\api\"; npm run dev }",
+      "problemMatcher": []
+    },
+    {
+      "label": "API: Stop (job)",
+      "type": "shell",
+      "command": "Get-Job -Name FleetApi -ErrorAction SilentlyContinue | Stop-Job -PassThru | Remove-Job",
+      "problemMatcher": []
+    },
+    {
+      "label": "Web: Start (job)",
+      "type": "shell",
+      "command": "Start-Job -Name FleetWeb -ScriptBlock { Push-Location \"c:\\Users\\bckmi\\OneDrive\\Desktop\\FLEET GESTAO DE FROTAS\\fleet-saas-latest\\web\"; $env:VITE_API_URL=\"http://localhost:4000/api\"; npm run dev }",
+      "problemMatcher": []
+    },
+    {
+      "label": "Web: Stop (job)",
+      "type": "shell",
+      "command": "Get-Job -Name FleetWeb -ErrorAction SilentlyContinue | Stop-Job -PassThru | Remove-Job",
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Both",
+      "type": "shell",
+      "command": "Start-Job -Name FleetApi -ScriptBlock { Push-Location \"c:\\Users\\bckmi\\OneDrive\\Desktop\\FLEET GESTAO DE FROTAS\\fleet-saas-latest\\api\"; npm run dev }; Start-Job -Name FleetWeb -ScriptBlock { Push-Location \"c:\\Users\\bckmi\\OneDrive\\Desktop\\FLEET GESTAO DE FROTAS\\fleet-saas-latest\\web\"; $env:VITE_API_URL=\"http://localhost:4000/api\"; npm run dev }",
+      "problemMatcher": []
+    },
+    {
+      "label": "Stop Both",
+      "type": "shell",
+      "command": "Get-Job -Name FleetApi,FleetWeb -ErrorAction SilentlyContinue | Stop-Job -PassThru | Remove-Job",
+      "problemMatcher": []
+    },
+    {
+      "label": "API: Prisma Generate",
+      "type": "shell",
+      "command": "Push-Location \"c:\\Users\\bckmi\\OneDrive\\Desktop\\FLEET GESTAO DE FROTAS\\fleet-saas-latest\\api\"; npm run prisma:generate",
+      "problemMatcher": []
+    },
+    {
+      "label": "API: Prisma Migrate Dev (SQLite)",
+      "type": "shell",
+      "command": "Push-Location \"c:\\Users\\bckmi\\OneDrive\\Desktop\\FLEET GESTAO DE FROTAS\\fleet-saas-latest\\api\"; npm run prisma:migrate",
+      "problemMatcher": []
+    },
+    {
+      "label": "API: Seed",
+      "type": "shell",
+      "command": "Push-Location \"c:\\Users\\bckmi\\OneDrive\\Desktop\\FLEET GESTAO DE FROTAS\\fleet-saas-latest\\api\"; npm run seed",
+      "problemMatcher": []
+    }
+  ]
+}

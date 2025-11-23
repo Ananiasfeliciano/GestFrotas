@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "API: Launch (ts-node-dev)",
+      "cwd": "${workspaceFolder}/api",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal",
+      "env": {
+        "PORT": "4000"
+      }
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Web: Launch (Vite)",
+      "cwd": "${workspaceFolder}/web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Launch Both (API + Web)",
+      "configurations": ["API: Launch (ts-node-dev)", "Web: Launch (Vite)"]
+    }
+  ]
+}
